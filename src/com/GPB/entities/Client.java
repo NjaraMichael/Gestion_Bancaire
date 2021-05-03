@@ -20,7 +20,7 @@ public class Client implements Serializable {
     private String Nom;
     
     @SerializedName("Solde")
-    private long Solde;
+    private int Solde;
 
     public String getNumCompte() {
         return NumCompte;
@@ -42,7 +42,7 @@ public class Client implements Serializable {
         return Solde;
     }
 
-    public void setSolde(long Solde) {
+    public void setSolde(int Solde) {
         this.Solde = Solde;
     }
 }

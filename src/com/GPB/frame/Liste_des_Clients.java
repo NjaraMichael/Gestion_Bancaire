@@ -23,10 +23,6 @@ import javax.swing.JTable;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.proteanit.sql.DbUtils;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,7 +59,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     public Liste_des_Clients() throws SQLException {
         initComponents();
         conn = ConexionBD.Conexion();
-//        Affichage();
+//        loadData();
         remove_title_bar();
         txtrechercher.setText("Taper Cin Client");
         txtrechercher1.setText("Taper Nom Client");
@@ -79,23 +75,29 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }
     
     private void loadData() {
+        System.out.println("Load data ... ");
         try {
+            System.out.println("try");
             ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
-            clientAPI.findAll().enqueue(new Callback<List<Client>>() {
+            clientAPI.getClients_JSON().enqueue(new Callback<List<Client>>() {
                 @Override
                 public void onResponse(Call<List<Client>> call, Response<List<Client>> response) {
+                    System.out.println("1");
                     if(response.isSuccessful()) {
+                        System.out.println("2");
                         DefaultTableModel defaultTableModel = new DefaultTableModel();
                         defaultTableModel.addColumn("NumCompte");
                         defaultTableModel.addColumn("Nom");
                         defaultTableModel.addColumn("Solde");
                         for(Client client : response.body()) {
+                            System.out.println("3");
                             defaultTableModel.addRow(new Object[] {
                                 client.getNumCompte(),
                                 client.getNom(),
                                 client.getSolde()
                             });
                         }
+                        System.out.println("defaultTableModel: "+defaultTableModel);
                         Table.setModel(defaultTableModel);
                     }
                 }
@@ -158,7 +160,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }
 
     //display table
-    public void Affichage() {
+    /*public void loadData() {
         try {
             String requete = "select cin as 'CIN' ,nomc as 'Nom',prenomc as 'Prenom',date_naissance as 'Date de Naissance',adresse as 'Adresse',sexe As 'Sexe',gsm as 'GSM',date_inscription as 'Date dinscription' from client_table ";
             System.out.println(requete);
@@ -180,7 +182,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
             }
         }
 
-    }
+    }*/
 
     public void Deplace() {
         int row = Table.getSelectedRow();
@@ -883,7 +885,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_formInternalFrameActivated
 
     private void TableMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseEntered
-        //Affichage();
+        //loadData();
     }//GEN-LAST:event_TableMouseEntered
 
     private void btnsupprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnsupprimerActionPerformed
@@ -919,7 +921,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         }
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        Affichage();
+        loadData();
         clear();
 
 
@@ -954,7 +956,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         act.setVisible(true);
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        Affichage();
+        loadData();
         clear();
         ImageIcon img202 = new ImageIcon(getClass().getResource("file_image_1.png"));
         image.setIcon(img202);
@@ -988,7 +990,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_printbtnActionPerformed
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        Affichage();
+        loadData();
         clear();
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
@@ -1012,7 +1014,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtrechercherActionPerformed
 
     private void btnrefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnrefreshActionPerformed
-        Affichage();
+        loadData();
 
         clear();
         btnsupprimer.setEnabled(false);
@@ -1090,7 +1092,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtrechercherKeyPressed
 
     private void txtrechercherMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtrechercherMouseClicked
-        Affichage();
+        loadData();
         clear();
 
         btnsupprimer.setEnabled(false);
@@ -1112,7 +1114,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtrechercherMouseEntered
 
     private void txtrechercher1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtrechercher1MouseClicked
-        Affichage();
+        loadData();
         clear();
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);

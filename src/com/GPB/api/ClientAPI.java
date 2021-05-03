@@ -20,18 +20,18 @@ import retrofit2.http.Path;
  * @author Mendrikaja
  */
 public interface ClientAPI {
-    @GET("list")
-    Call<List<Client>> findAll();
+    @GET("clients/list")
+    Call<List<Client>> getClients_JSON();
     
-    @GET("get/{NumCompte}")
+    @GET("clients/get/{NumCompte}")
     Call<Client> find(@Path("NumCompte") String NumCompte);
     
-    @POST("add")
+    @POST("clients/add")
     Call<Void> create(@Body Client client);
     
-    @PUT("update")
+    @PUT("clients/update")
     Call<Void> update(@Body Client client);
     
-    @DELETE("delete/{NumCompte}")
+    @DELETE("clients/delete/{NumCompte}")
     Call<Void> delete(@Path("NumCompte") String NumCompte);
 }

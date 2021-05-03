@@ -26,6 +26,8 @@ public class UserAPI {
                 .client(user)
                 .build();
         
+        System.out.println("retrofit: "+retrofit);
         return retrofit;
+        
     }
 }

@@ -29,7 +29,7 @@ public class ConexionBD {
             //DriverManager.registerDriver(new com.mysql.jdbc.Driver());
             // ou bien 
             Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/gpb", "root", "");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/back_java_gb_jax_rs", "root", "");
             if (conn != null) {
                 System.out.println("Connexion à la base de données a été établie avec succès");
             } else {

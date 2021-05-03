@@ -513,7 +513,7 @@ public class AjoutClient extends javax.swing.JFrame {
                
                client.setNumCompte(txtNumCompte.getText());
                client.setNom(txtNom.getText());
-               client.setSolde(Long.parseLong(txtSolde.getText()));
+               client.setSolde(Integer.parseInt(txtSolde.getText()));
                ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
                clientAPI.create(client).enqueue(new Callback<Void>() {
                    @Override
