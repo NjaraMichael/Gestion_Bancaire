@@ -5,6 +5,9 @@
  */
 package com.GPB.frame;
 
+import com.GPB.api.ClientAPI;
+import com.GPB.api.UserAPI;
+import com.GPB.entities.Client;
 import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
@@ -20,6 +23,9 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  *
@@ -74,9 +80,9 @@ public class AjoutClient extends javax.swing.JFrame {
     }
 
     public void cleardata() {
-        txtcin.setText("");
-        txtnom.setText("");
-        txtprenom.setText("");
+        txtNumCompte.setText("");
+        txtNom.setText("");
+        txtSolde.setText("");
         txtdtnaissance.setDate(null);
         txtage.setText("");
         txtgsm.setText("");
@@ -98,12 +104,12 @@ public class AjoutClient extends javax.swing.JFrame {
             rs = ps.executeQuery();
             if (rs.next()) {
                 String t1 = rs.getString("cin");
-                txtcin.setText(t1);
+                txtNumCompte.setText(t1);
                 cin = t1;
                 String t2 = rs.getString("nomc");
-                txtnom.setText(t2);
+                txtNom.setText(t2);
                 String t = rs.getString("prenomc");
-                txtprenom.setText(t);
+                txtSolde.setText(t);
                 Date t3 = rs.getDate("date_naissance");
                 txtdtnaissance.setDate(t3);
                 String t4 = rs.getString("age");
@@ -164,7 +170,7 @@ public class AjoutClient extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         txtgsm = new javax.swing.JTextField();
-        txtcin = new javax.swing.JTextField();
+        txtNumCompte = new javax.swing.JTextField();
         jRadioButton2 = new javax.swing.JRadioButton();
         jLabel6 = new javax.swing.JLabel();
         txtage = new javax.swing.JTextField();
@@ -173,11 +179,11 @@ public class AjoutClient extends javax.swing.JFrame {
         jRadioButton1 = new javax.swing.JRadioButton();
         jLabel7 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        txtprenom = new javax.swing.JTextField();
+        txtSolde = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         txtdtnaissance = new com.toedter.calendar.JDateChooser();
         jLabel5 = new javax.swing.JLabel();
-        txtnom = new javax.swing.JTextField();
+        txtNom = new javax.swing.JTextField();
         modifierok = new javax.swing.JButton();
         jDesktopPane1 = new javax.swing.JDesktopPane();
         jPanel3 = new javax.swing.JPanel();
@@ -228,7 +234,7 @@ public class AjoutClient extends javax.swing.JFrame {
         jLabel4.setText("Date de naissance * :");
 
         jLabel3.setFont(new java.awt.Font("Times New Roman", 3, 12)); // NOI18N
-        jLabel3.setText("Prénom * :");
+        jLabel3.setText("Solde * :");
 
         txtgsm.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
@@ -236,9 +242,9 @@ public class AjoutClient extends javax.swing.JFrame {
             }
         });
 
-        txtcin.addActionListener(new java.awt.event.ActionListener() {
+        txtNumCompte.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtcinActionPerformed(evt);
+                txtNumCompteActionPerformed(evt);
             }
         });
 
@@ -283,7 +289,7 @@ public class AjoutClient extends javax.swing.JFrame {
         jLabel7.setText("Tél  * :");
 
         jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        jLabel1.setText("CIN * :");
+        jLabel1.setText("N°Compte* :");
         jLabel1.setToolTipText("");
 
         jLabel8.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
@@ -346,9 +352,9 @@ public class AjoutClient extends javax.swing.JFrame {
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(10, 10, 10)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtcin, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtnom, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtprenom, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNumCompte, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNom, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtSolde, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtdtnaissance, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtage, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -383,11 +389,11 @@ public class AjoutClient extends javax.swing.JFrame {
                         .addGap(23, 23, 23)
                         .addComponent(jLabel5))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtcin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtNumCompte, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(20, 20, 20)
-                        .addComponent(txtnom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtNom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(20, 20, 20)
-                        .addComponent(txtprenom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtSolde, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(20, 20, 20)
                         .addComponent(txtdtnaissance, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(20, 20, 20)
@@ -497,67 +503,91 @@ public class AjoutClient extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtcinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcinActionPerformed
+    private void txtNumCompteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumCompteActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtcinActionPerformed
+    }//GEN-LAST:event_txtNumCompteActionPerformed
 
     private void ajoutbtnokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ajoutbtnokActionPerformed
-        Date actuelle = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String date = dateFormat.format(actuelle);
-        String dc = date;
-        
-            int i = txtcin.getText().length();
-            System.out.println(i);
-            if(i!=12){
-                JOptionPane.showMessageDialog(null, "Le CIN doit être à 12 caractères");
-            } else {
-                try {
-            String requete = "insert into client_table (cin,nomc ,prenomc,date_naissance,age,sexe,gsm,adresse,date_inscription,image) values (?,?,?,?,?,?,?,?,'" + dc + "',?)";
-            ps = conn.prepareStatement(requete);
-            ps.setString(1, txtcin.getText());
-            ps.setString(2, txtnom.getText());
-            ps.setString(3, txtprenom.getText());
-            ps.setString(4, ((JTextField) txtdtnaissance.getDateEditor().getUiComponent()).getText());
-            ps.setString(5, txtage.getText());
-            
-            
-            
-            ps.setString(6, sexee);
-            ps.setString(7, txtgsm.getText());
-            ps.setString(8, txtadresse.getText());
-            /*ps.setString(9, etat);*/
+          try {
+               Client client = new Client();
+               
+               client.setNumCompte(txtNumCompte.getText());
+               client.setNom(txtNom.getText());
+               client.setSolde(Long.parseLong(txtSolde.getText()));
+               ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
+               clientAPI.create(client).enqueue(new Callback<Void>() {
+                   @Override
+                   public void onResponse(Call<Void> call, Response<Void> response) {
+                       if(response.isSuccessful()) {
+                           JOptionPane.showMessageDialog(null, "Enregistrement avec succès");
+                       }
+                   }
 
-            if (txtpath.getText().equalsIgnoreCase("")) {
-                ps.setString(9, "");
-            } else {
-                ps.setString(9, txtpath.getText());
-            }
-            
-            if(Integer.parseInt(txtage.getText()) < 18){
-                JOptionPane.showMessageDialog(null, "L'Age doit être suppérieur à 18");
-            } else {
-            ps.execute();
-            JOptionPane.showMessageDialog(null, "Enregistrement avec succès");
-            }
-            ps.close();
-            rs.close();
-            
-            } catch (HeadlessException | SQLException e) {
-            System.out.println("--> SQLException : " + e);
-            JOptionPane.showMessageDialog(null, "Tout est Obligatoire");
-        } finally {
-
-            try {
-                ps.close();
-                rs.close();
-
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "deja inserre");
-            }
-            }
-        
-        }
+                   @Override
+                   public void onFailure(Call<Void> call, Throwable t) {
+                       JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
+                   }
+               });
+               
+          } catch (Exception e) {
+              JOptionPane.showConfirmDialog(null, e.getMessage());
+          }
+//        Date actuelle = new Date();
+//        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        String date = dateFormat.format(actuelle);
+//        String dc = date;
+//        
+//            int i = txtNumCompte.getText().length();
+//            System.out.println(i);
+//            if(i!=12){
+//                JOptionPane.showMessageDialog(null, "Le CIN doit être à 12 caractères");
+//            } else {
+//                try {
+//            String requete = "insert into client_table (cin,nomc ,prenomc,date_naissance,age,sexe,gsm,adresse,date_inscription,image) values (?,?,?,?,?,?,?,?,'" + dc + "',?)";
+//            ps = conn.prepareStatement(requete);
+//            ps.setString(1, txtNumCompte.getText());
+//            ps.setString(2, txtNom.getText());
+//            ps.setString(3, txtSolde.getText());
+//            ps.setString(4, ((JTextField) txtdtnaissance.getDateEditor().getUiComponent()).getText());
+//            ps.setString(5, txtage.getText());
+//            
+//            
+//            
+//            ps.setString(6, sexee);
+//            ps.setString(7, txtgsm.getText());
+//            ps.setString(8, txtadresse.getText());
+//            /*ps.setString(9, etat);*/
+//
+//            if (txtpath.getText().equalsIgnoreCase("")) {
+//                ps.setString(9, "");
+//            } else {
+//                ps.setString(9, txtpath.getText());
+//            }
+//            
+//            if(Integer.parseInt(txtage.getText()) < 18){
+//                JOptionPane.showMessageDialog(null, "L'Age doit être suppérieur à 18");
+//            } else {
+//            ps.execute();
+//            JOptionPane.showMessageDialog(null, "Enregistrement avec succès");
+//            }
+//            ps.close();
+//            rs.close();
+//            
+//            } catch (HeadlessException | SQLException e) {
+//            System.out.println("--> SQLException : " + e);
+//            JOptionPane.showMessageDialog(null, "Tout est Obligatoire");
+//        } finally {
+//
+//            try {
+//                ps.close();
+//                rs.close();
+//
+//            } catch (SQLException e) {
+//                JOptionPane.showMessageDialog(null, "deja inserre");
+//            }
+//            }
+//        
+//        }
 
     }//GEN-LAST:event_ajoutbtnokActionPerformed
 
@@ -588,7 +618,7 @@ public class AjoutClient extends javax.swing.JFrame {
 
     private void modifierokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modifierokActionPerformed
 
-        String cin2 = txtcin.getText();
+        String cin2 = txtNumCompte.getText();
         
             if(!cin2.equals(cin)){
                 JOptionPane.showMessageDialog(null, "Le CIN n'est pas modifiable \n Sinon, veillez enregistrer un nouveau client");
@@ -598,9 +628,9 @@ public class AjoutClient extends javax.swing.JFrame {
         String requete = "update client_table set cin =?,nomc =?,prenomc=?,date_naissance =?,age =?,sexe =?,gsm =?,adresse=?,image =? where  cin ='" + cin2 + "'";
         try {
             ps = conn.prepareStatement(requete);
-            ps.setString(1, txtcin.getText());
-            ps.setString(2, txtnom.getText());
-            ps.setString(3, txtprenom.getText());
+            ps.setString(1, txtNumCompte.getText());
+            ps.setString(2, txtNom.getText());
+            ps.setString(3, txtSolde.getText());
             ps.setString(4, ((JTextField) txtdtnaissance.getDateEditor().getUiComponent()).getText());
             ps.setString(5, txtage.getText());
             ps.setString(6, sexee);
@@ -802,13 +832,13 @@ public class AjoutClient extends javax.swing.JFrame {
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton modifierok;
+    private javax.swing.JTextField txtNom;
+    private javax.swing.JTextField txtNumCompte;
+    private javax.swing.JTextField txtSolde;
     private javax.swing.JTextField txtadresse;
     private javax.swing.JTextField txtage;
-    private javax.swing.JTextField txtcin;
     private com.toedter.calendar.JDateChooser txtdtnaissance;
     private javax.swing.JTextField txtgsm;
-    private javax.swing.JTextField txtnom;
     private javax.swing.JTextField txtpath;
-    private javax.swing.JTextField txtprenom;
     // End of variables declaration//GEN-END:variables
 }

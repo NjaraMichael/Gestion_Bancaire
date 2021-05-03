@@ -143,9 +143,9 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
     public void clear() {
         try {
-            txtcin.setText("");
-            txtnom.setText("");
-            txtprenom.setText("");
+            txtNumCompte.setText("");
+            txtNom.setText("");
+            txtSolde.setText("");
             txtns.setText("");
             txtage.setText("");
             txtesex.setText("");
@@ -183,56 +183,73 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }
 
     public void Deplace() {
-        try {
-
-            int row = Table.getSelectedRow();
-            Liste_des_Clients.test = (Table.getModel().getValueAt(row, 0).toString());
-            String requet = " select * from  client_table where cin = '" + test + "' ";
-            ps = conn.prepareStatement(requet);
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                String t1 = rs.getString("cin");
-                txtcin.setText(t1);
-                String t2 = rs.getString("nomc");
-                txtnom.setText(t2);
-                String t3 = rs.getString("prenomc");
-                txtprenom.setText(t3);
-                String t4 = rs.getString("date_naissance");
-                txtns.setText(t4);
-                String t5 = rs.getString("age");
-                txtage.setText(t5);
-                String t = rs.getString("sexe");
-                txtesex.setText(t);
-                String t7 = rs.getString("gsm");
-                txtesexe.setText(t7);
-                String t8 = rs.getString("adresse");
-                txtmail.setText(t8);
-                String t9 = rs.getString("date_inscription");
-                txtinscri.setText(t9);
-                String t10 = rs.getString("image");
-                if (t10.equals("")) {
-                    ImageIcon img202 = new ImageIcon(getClass().getResource("file_image_1.png"));
-                    image.setIcon(img202);
-                } else {
-                    image.setIcon(new ImageIcon(t10));
-                }
+        int row = Table.getSelectedRow();
+        String id = Table.getValueAt(row, 0).toString();
+        ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
+        clientAPI.find(id).enqueue(new Callback<Client>(){
+            @Override
+            public void onResponse(Call<Client> call, Response<Client> response) {
+                Client client = response.body();
+                txtNumCompte.setText(client.getNumCompte());
+                txtNom.setText(client.getNom());
+                txtSolde.setText(String.valueOf(client.getSolde()));
             }
-            ps.close();
-            rs.close();
-        } catch (SQLException e) {
-            System.out.println(e);
 
-        } finally {
-
-            try {
-                ps.close();
-                rs.close();
-
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "erreur BD");
+            @Override
+            public void onFailure(Call<Client> call, Throwable t) {
+                JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
             }
-        }
+        });
+//        try {
+//
+//            int row = Table.getSelectedRow();
+//            Liste_des_Clients.test = (Table.getModel().getValueAt(row, 0).toString());
+//            String requet = " select * from  client_table where cin = '" + test + "' ";
+//            ps = conn.prepareStatement(requet);
+//            rs = ps.executeQuery();
+//
+//            if (rs.next()) {
+//                String t1 = rs.getString("cin");
+//                txtNumCompte.setText(t1);
+//                String t2 = rs.getString("nomc");
+//                txtNom.setText(t2);
+//                String t3 = rs.getString("prenomc");
+//                txtSolde.setText(t3);
+//                String t4 = rs.getString("date_naissance");
+//                txtns.setText(t4);
+//                String t5 = rs.getString("age");
+//                txtage.setText(t5);
+//                String t = rs.getString("sexe");
+//                txtesex.setText(t);
+//                String t7 = rs.getString("gsm");
+//                txtesexe.setText(t7);
+//                String t8 = rs.getString("adresse");
+//                txtmail.setText(t8);
+//                String t9 = rs.getString("date_inscription");
+//                txtinscri.setText(t9);
+//                String t10 = rs.getString("image");
+//                if (t10.equals("")) {
+//                    ImageIcon img202 = new ImageIcon(getClass().getResource("file_image_1.png"));
+//                    image.setIcon(img202);
+//                } else {
+//                    image.setIcon(new ImageIcon(t10));
+//                }
+//            }
+//            ps.close();
+//            rs.close();
+//        } catch (SQLException e) {
+//            System.out.println(e);
+//
+//        } finally {
+//
+//            try {
+//                ps.close();
+//                rs.close();
+//
+//            } catch (SQLException e) {
+//                JOptionPane.showMessageDialog(null, "erreur BD");
+//            }
+//        }
     }
 
     public String gettableresult() {
@@ -251,13 +268,13 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        txtprenom = new javax.swing.JLabel();
+        txtSolde = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         txtns = new javax.swing.JLabel();
-        txtnom = new javax.swing.JLabel();
+        txtNom = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        txtcin = new javax.swing.JLabel();
+        txtNumCompte = new javax.swing.JLabel();
         txtage = new javax.swing.JLabel();
         txtmail = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -335,23 +352,23 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
         jLabel4.setText("Date de naissance  :");
 
-        txtprenom.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        txtprenom.setForeground(new java.awt.Color(0, 0, 153));
+        txtSolde.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        txtSolde.setForeground(new java.awt.Color(0, 0, 153));
 
-        jLabel3.setText("Prenom  :");
+        jLabel3.setText("Solde :");
 
         txtns.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         txtns.setForeground(new java.awt.Color(0, 0, 153));
 
-        txtnom.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        txtnom.setForeground(new java.awt.Color(0, 0, 153));
+        txtNom.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        txtNom.setForeground(new java.awt.Color(0, 0, 153));
 
         jLabel8.setText("Adresse :");
 
-        jLabel1.setText("CIN   :            ");
+        jLabel1.setText("N°Compte :");
 
-        txtcin.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        txtcin.setForeground(new java.awt.Color(0, 0, 153));
+        txtNumCompte.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        txtNumCompte.setForeground(new java.awt.Color(0, 0, 153));
 
         txtage.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         txtage.setForeground(new java.awt.Color(0, 0, 153));
@@ -397,13 +414,13 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtmail, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                            .addComponent(txtnom, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNom, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtage, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtns, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtesex, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtcin, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNumCompte, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtesexe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtprenom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(txtSolde, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel11)
@@ -417,13 +434,13 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
                 .addGap(2, 2, 2)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtcin, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtNumCompte, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtnom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtNom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtprenom, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtSolde, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(3, 3, 3)
                         .addComponent(txtns, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -848,7 +865,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         act.cleardata();
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        Affichage();
+        loadData();
         clear();
         //ImageIcon img202 = new ImageIcon(getClass().getResource("file_image_1.png"));
         //image.setIcon(img202);
@@ -873,11 +890,11 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         try {
             if (JOptionPane.showConfirmDialog(null, "attention vous devez suprimer un Client,est ce que tu es sur?",
                     "Supprimer Client", JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION) {
-                if (txtcin.getText().length() != 0) {
+                if (txtNumCompte.getText().length() != 0) {
 
                     String requete = "delete from client_table where cin = ?";
                     ps = conn.prepareStatement(requete);
-                    ps.setString(1, txtcin.getText());
+                    ps.setString(1, txtNumCompte.getText());
                     ps.execute();
                     System.out.println("deleted");
                     clear();
@@ -1158,7 +1175,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
     private void ccodeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ccodeMouseClicked
         String info = "<html><head></head><body><h3 color ='#2C4CCC'><center>Contrat du Code de la route</center></h3><p>Cin :<b><i>" + test + "</i></b></p>"
-                + "<br><p>Nom & Prénom :<b><i>" + txtnom.getText() + "</i> " + txtprenom.getText() + "</b></p>"
+                + "<br><p>Nom & Prénom :<b><i>" + txtNom.getText() + "</i> " + txtSolde.getText() + "</b></p>"
                 + "<br><p >Nombre D'heures du contrat :<b><i>" + nbrh2 + "</i></b></p>"
                 + "<br><p >Montant du Contrat  :<b><i>" + mont2 + "Dt</i></b></p>"
                 + "<br><p >Catégorie du Permis :<b><i>" + catp2 + "</i></b></p>"
@@ -1172,7 +1189,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
     private void cconduiteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cconduiteMouseClicked
         String info = "<html><head></head><body><h3 color='#2C4CCC'><center>Contrat du Conduite</center></h3> <p >Cin :<b><i>" + test + "</i></b></p>"
-                + "<br><p>Nom & Prénom :<b><i>" + txtnom.getText() + "</i>  " + txtprenom.getText() + "</b></p>"
+                + "<br><p>Nom & Prénom :<b><i>" + txtNom.getText() + "</i>  " + txtSolde.getText() + "</b></p>"
                 + "<br><p >Nombre D'heures du contrat :<b><i>" + nbrh + "</i></b></p>"
                 + "<br><p >Montant du Contrat  :<b><i>" + mont + "Dt</i></b></p>"
                 + "<br><p >Catégorie du Permis :<b><i>" + catp + "</i></b></p>"
@@ -1275,17 +1292,17 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     public javax.swing.JButton modifierbtn;
     private javax.swing.JLabel nncontart;
     private javax.swing.JButton printbtn;
+    private javax.swing.JLabel txtNom;
+    private javax.swing.JLabel txtNumCompte;
+    private javax.swing.JLabel txtSolde;
     private javax.swing.JLabel txtage;
     private javax.swing.JLabel txtbachground;
     private javax.swing.JLabel txtbackground1;
-    private javax.swing.JLabel txtcin;
     private javax.swing.JLabel txtesex;
     private javax.swing.JLabel txtesexe;
     private javax.swing.JLabel txtinscri;
     private javax.swing.JLabel txtmail;
-    private javax.swing.JLabel txtnom;
     private javax.swing.JLabel txtns;
-    private javax.swing.JLabel txtprenom;
     private javax.swing.JTextField txtrechercher;
     private javax.swing.JTextField txtrechercher1;
     // End of variables declaration//GEN-END:variables
