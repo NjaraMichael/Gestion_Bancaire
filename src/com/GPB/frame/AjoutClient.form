@@ -98,9 +98,9 @@
                           </Group>
                           <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtcin" min="-2" pref="205" max="-2" attributes="0"/>
-                              <Component id="txtnom" min="-2" pref="205" max="-2" attributes="0"/>
-                              <Component id="txtprenom" min="-2" pref="205" max="-2" attributes="0"/>
+                              <Component id="txtNumCompte" min="-2" pref="205" max="-2" attributes="0"/>
+                              <Component id="txtNom" min="-2" pref="205" max="-2" attributes="0"/>
+                              <Component id="txtSolde" min="-2" pref="205" max="-2" attributes="0"/>
                               <Component id="txtdtnaissance" min="-2" pref="210" max="-2" attributes="0"/>
                               <Component id="txtage" min="-2" pref="210" max="-2" attributes="0"/>
                           </Group>
@@ -144,11 +144,11 @@
                           <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="txtcin" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtNumCompte" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="20" pref="20" max="-2" attributes="0"/>
-                          <Component id="txtnom" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtNom" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="20" pref="20" max="-2" attributes="0"/>
-                          <Component id="txtprenom" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtSolde" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="20" pref="20" max="-2" attributes="0"/>
                           <Component id="txtdtnaissance" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="20" pref="20" max="-2" attributes="0"/>
@@ -190,7 +190,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Times New Roman" size="12" style="3"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Pr&#xe9;nom * :"/>
+            <Property name="text" type="java.lang.String" value="Solde * :"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtgsm">
@@ -198,9 +198,9 @@
             <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtgsmKeyTyped"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtcin">
+        <Component class="javax.swing.JTextField" name="txtNumCompte">
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtcinActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtNumCompteActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="jRadioButton2">
@@ -266,11 +266,11 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Times New Roman" size="12" style="1"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="CIN * :"/>
+            <Property name="text" type="java.lang.String" value="N&#xb0;Compte* :"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtprenom">
+        <Component class="javax.swing.JTextField" name="txtSolde">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel8">
           <Properties>
@@ -301,7 +301,7 @@
             <Property name="text" type="java.lang.String" value="Age :"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtnom">
+        <Component class="javax.swing.JTextField" name="txtNom">
         </Component>
       </SubComponents>
     </Container>
