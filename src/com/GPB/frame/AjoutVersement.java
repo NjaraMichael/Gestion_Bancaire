@@ -7,7 +7,9 @@ package com.GPB.frame;
 
 import com.GPB.api.ClientAPI;
 import com.GPB.api.UserAPI;
+import com.GPB.api.VersementAPI;
 import com.GPB.entities.Client;
+import com.GPB.entities.Versement;
 import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
@@ -17,6 +19,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +34,7 @@ import retrofit2.Response;
  *
  * @author anouer
  */
-public class AjoutClient extends javax.swing.JFrame {
+public class AjoutVersement extends javax.swing.JFrame {
 
     Connection conn = null;
     ResultSet rs = null;
@@ -48,7 +51,7 @@ public class AjoutClient extends javax.swing.JFrame {
      * Creates new form AjoutCandidat
      * @throws java.sql.SQLException
      */
-    public AjoutClient() throws SQLException {
+    public AjoutVersement() throws SQLException {
         initComponents();
         //this.setIconImage(new ImageIcon(getClass().getResource("logocar.png")).getImage());
         conn = ConexionBD.Conexion();
@@ -59,10 +62,48 @@ public class AjoutClient extends javax.swing.JFrame {
 
 //        ImageIcon img202 = new ImageIcon(getClass().getResource("file_image_1.png"));
 //        image.setIcon(img202);
+//        if(txtdateVe.getDate() == null) {
+            Date actuelle = new Date();
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            txtdateVe.setDate(actuelle);
+//        }
+//           try {
+//            ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
+//            clientAPI.findall().enqueue(new Callback<List<Client>>() {
+//                @Override
+//                public void onResponse(Call<List<Client>> call, Response<List<Client>> response) {
+//                    if(response.isSuccessful()) {
+//                        for(Client client : response.body()) {
+//                            
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<List<Client>> call, Throwable t) {
+//                    JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
+//                }    
+//            });
+//        } catch (Exception e) {
+//            JOptionPane.showConfirmDialog(null, e.getMessage());
+//        }
+//        
+//        Liste_des_Versements lv;
+//        lv = new Liste_des_Versements();
+//        if(!"".equals(txtMontant.getText())) {
+//            jComboBox1.setSelectedItem(lv.txtNumCompte.getText());
+//        }else {
+//            jComboBox1.setSelectedItem(null);
+//        }
+//        jComboBox1.setSelectedItem(lv.txtNumCompte.getText());
+
+           txtId.setVisible(false);
+
+            
     }
 
     private void recept() throws SQLException {
-        Liste_des_Clients ad = new Liste_des_Clients();
+        Liste_des_Versements ad = new Liste_des_Versements();
         String r = ad.re();
         if ("ah".equals(r)) {
             modifierok.setVisible(true);
@@ -78,15 +119,14 @@ public class AjoutClient extends javax.swing.JFrame {
     }
 
     public void cleardata() {
+//        txtNumCompte.setText("");
         txtNumCompte.setText("");
-        txtNom.setText("");
-        txtSolde.setText("");
-        sexee = "Masculin";
-        etat = "Actif";
+        txtMontant.setText("");
+//        txtdateVe.setDate(null);
     }
 
     public void Recuper() throws SQLException {
-        Liste_des_Clients inf = new Liste_des_Clients();
+//        Liste_des_Versements inf = new Liste_des_Versements();
 //        try {
 //            String rec = inf.gettableresult();
 //            String requet = "select * from client_table where cin = '" + rec + "'";
@@ -150,16 +190,18 @@ public class AjoutClient extends javax.swing.JFrame {
         ajoutbtnok = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        txtNumCompte = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        txtSolde = new javax.swing.JTextField();
-        txtNom = new javax.swing.JTextField();
+        txtMontant = new javax.swing.JTextField();
+        txtdateVe = new com.toedter.calendar.JDateChooser();
+        jLabel4 = new javax.swing.JLabel();
+        txtNomB = new javax.swing.JTextField();
+        txtNumCompte = new javax.swing.JTextField();
         modifierok = new javax.swing.JButton();
+        txtId = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(510, 260));
-        setPreferredSize(new java.awt.Dimension(510, 260));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -190,23 +232,41 @@ public class AjoutClient extends javax.swing.JFrame {
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)), "Information Client :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 14))); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)), "Versement :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 14))); // NOI18N
 
-        jLabel3.setFont(new java.awt.Font("Times New Roman", 3, 12)); // NOI18N
-        jLabel3.setText("Solde * :");
-
-        txtNumCompte.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNumCompteActionPerformed(evt);
-            }
-        });
+        jLabel3.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel3.setText("Date * :");
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        jLabel2.setText("Nom * :");
+        jLabel2.setText("Montant * :");
 
         jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         jLabel1.setText("N°Compte * :");
         jLabel1.setToolTipText("");
+
+        txtdateVe.setDateFormatString("dd/MM/yyyy");
+
+        jLabel4.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel4.setText("Nom Bénéficiaire * :");
+        jLabel4.setToolTipText("");
+
+        txtNomB.setEnabled(false);
+        txtNomB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNomBActionPerformed(evt);
+            }
+        });
+        txtNomB.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtNomBKeyReleased(evt);
+            }
+        });
+
+        txtNumCompte.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtNumCompteKeyReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -215,34 +275,44 @@ public class AjoutClient extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(81, 81, 81)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtNumCompte, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNom, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtSolde, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(76, 76, 76)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtNomB)
+                    .addComponent(txtMontant, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                    .addComponent(txtdateVe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtNumCompte))
                 .addGap(15, 15, 15))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNumCompte, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNomB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(txtMontant, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20)
-                        .addComponent(jLabel2)
-                        .addGap(23, 23, 23)
+                        .addGap(6, 6, 6)
                         .addComponent(jLabel3))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtNumCompte, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20)
-                        .addComponent(txtNom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20)
-                        .addComponent(txtSolde, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(txtdateVe, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         modifierok.setText("update");
@@ -258,26 +328,34 @@ public class AjoutClient extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(52, 52, 52)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(58, 58, 58))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(104, 104, 104)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(modifierok, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
                             .addComponent(ajoutbtnok, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(57, 57, 57))))
+                        .addGap(57, 57, 57)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(ajoutbtnok)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(modifierok)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(ajoutbtnok)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(modifierok))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1.getAccessibleContext().setAccessibleName("Information Candidat :");
@@ -286,21 +364,20 @@ public class AjoutClient extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtNumCompteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumCompteActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtNumCompteActionPerformed
-
     private void ajoutbtnokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ajoutbtnokActionPerformed
           try {
-               Client client = new Client();
-               final Liste_des_Clients a = new Liste_des_Clients();
+               Versement versement = new Versement();
+               final Liste_des_Versements a = new Liste_des_Versements();
+//                Date actuelle = new Date();
+                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                String date = dateFormat.format(txtdateVe.getDate());
                
                
-               client.setNumCompte(txtNumCompte.getText());
-               client.setNom(txtNom.getText());
-               client.setSolde(Integer.parseInt(txtSolde.getText()));
-               ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
-               clientAPI.create(client).enqueue(new Callback<Void>() {
+               versement.setNumCompte(txtNumCompte.getText());
+               versement.setMontant_Versement(Integer.parseInt(txtMontant.getText()));
+               versement.setDateVersement(date);
+               VersementAPI versementAPI = UserAPI.getUser().create(VersementAPI.class);
+               versementAPI.create(versement).enqueue(new Callback<Void>() {
                    @Override
                    public void onResponse(Call<Void> call, Response<Void> response) {
                        if(response.isSuccessful()) {
@@ -405,18 +482,22 @@ public class AjoutClient extends javax.swing.JFrame {
 
     private void modifierokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modifierokActionPerformed
         try {
-               Client client = new Client();
-               final Liste_des_Clients a = new Liste_des_Clients();
+               Versement versement = new Versement();
+//               final Liste_des_Clients a = new Liste_des_Clients();
                
-               client.setNumCompte(txtNumCompte.getText());
-               client.setNom(txtNom.getText());
-               client.setSolde(Integer.parseInt(txtSolde.getText()));
-               ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
-               clientAPI.update(client).enqueue(new Callback<Void>() {
+               DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+               String date = dateFormat.format(txtdateVe.getDate());
+               
+               versement.setIdVersement(Integer.parseInt(txtId.getText()));
+               versement.setNumCompte(txtNumCompte.getText());
+               versement.setMontant_Versement(Integer.parseInt(txtMontant.getText()));
+               versement.setDateVersement(date);
+               VersementAPI versementAPI = UserAPI.getUser().create(VersementAPI.class);
+               versementAPI.update(versement).enqueue(new Callback<Void>() {
                    @Override
                    public void onResponse(Call<Void> call, Response<Void> response) {
                        if(response.isSuccessful()) {
-                           a.loadData();
+//                           a.loadData();
                            JOptionPane.showMessageDialog(null, "Enregistrement avec succès");
                            dispose();
                        }
@@ -431,6 +512,35 @@ public class AjoutClient extends javax.swing.JFrame {
           } catch (Exception e) {
               JOptionPane.showConfirmDialog(null, e.getMessage());
           }
+//        try {
+//               Versement versement = new Versement();
+//               final Liste_des_Versements a = new Liste_des_Versements();
+//               DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//               String date = dateFormat.format(txtdateVe.getDate());
+//               
+//               versement.setNumCompte(txtNumCompte.getText());
+//               versement.setMontant_Versement(Integer.parseInt(txtMontant.getText()));
+//               versement.setDateVersement(date);
+//               VersementAPI versementAPI = UserAPI.getUser().create(VersementAPI.class);
+//               versementAPI.update(versement).enqueue(new Callback<Void>() {
+//                   @Override
+//                   public void onResponse(Call<Void> call, Response<Void> response) {
+//                       if(response.isSuccessful()) {
+//                           a.loadData();
+//                           JOptionPane.showMessageDialog(null, "Modification avec succes");
+//                           dispose();
+//                       }
+//                   }
+//
+//                   @Override
+//                   public void onFailure(Call<Void> call, Throwable t) {
+//                       JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
+//                   }
+//               });
+//               
+//          } catch (Exception e) {
+//              JOptionPane.showConfirmDialog(null, e.getMessage());
+//          }
         
 //        String cin2 = txtNumCompte.getText();
 //        
@@ -473,6 +583,38 @@ public class AjoutClient extends javax.swing.JFrame {
 //}
     }//GEN-LAST:event_modifierokActionPerformed
 
+    private void txtNomBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNomBActionPerformed
+
+    private void txtNumCompteKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNumCompteKeyReleased
+        ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
+        clientAPI.find(txtNumCompte.getText()).enqueue(new Callback<Client>(){
+            @Override
+            public void onResponse(Call<Client> call, Response<Client> response) {
+                Client client = response.body();
+                txtNomB.setText(client.getNom());
+            }
+
+            @Override
+            public void onFailure(Call<Client> call, Throwable t) {
+                JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+        
+        if(txtNomB.getText() != "") {
+                    ajoutbtnok.setEnabled(true);
+                    modifierok.setEnabled(true);
+        }else{
+            ajoutbtnok.setEnabled(false);
+            modifierok.setEnabled(false);
+        }
+    }//GEN-LAST:event_txtNumCompteKeyReleased
+
+    private void txtNomBKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNomBKeyReleased
+        
+    }//GEN-LAST:event_txtNomBKeyReleased
+
 
     /**
      * red();
@@ -493,8 +635,10 @@ public class AjoutClient extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AjoutClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AjoutVersement.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
@@ -506,25 +650,28 @@ public class AjoutClient extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
-                    new AjoutClient().setVisible(true);
+                    new AjoutVersement().setVisible(true);
                 } catch (SQLException ex) {
-                    Logger.getLogger(AjoutClient.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(AjoutVersement.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ajoutbtnok;
+    public javax.swing.JButton ajoutbtnok;
     public javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JButton modifierok;
-    public javax.swing.JTextField txtNom;
+    public javax.swing.JButton modifierok;
+    public javax.swing.JTextField txtId;
+    public javax.swing.JTextField txtMontant;
+    public javax.swing.JTextField txtNomB;
     public javax.swing.JTextField txtNumCompte;
-    public javax.swing.JTextField txtSolde;
+    public com.toedter.calendar.JDateChooser txtdateVe;
     // End of variables declaration//GEN-END:variables
 }

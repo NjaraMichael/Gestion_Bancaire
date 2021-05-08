@@ -21,10 +21,13 @@ import retrofit2.http.Path;
  */
 public interface ClientAPI {
     @GET("clients/list")
-    Call<List<Client>> getClients_JSON();
+    Call<List<Client>> findall();
     
     @GET("clients/get/{NumCompte}")
     Call<Client> find(@Path("NumCompte") String NumCompte);
+    
+    @GET("clients/search/{keyword}")
+    Call<List<Client>> findBy(@Path("keyword") String keyword);
     
     @POST("clients/add")
     Call<Void> create(@Body Client client);

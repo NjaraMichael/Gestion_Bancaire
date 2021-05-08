@@ -5,9 +5,12 @@
  */
 package com.GPB.frame;
 
+
 import com.GPB.api.ClientAPI;
 import com.GPB.api.UserAPI;
+import com.GPB.api.RetraitAPI;
 import com.GPB.entities.Client;
+import com.GPB.entities.Retrait;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
@@ -16,6 +19,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -37,7 +43,7 @@ import retrofit2.Response;
  *
  * @author anouer
  */
-public final class Liste_des_Clients extends javax.swing.JInternalFrame {
+public final class Liste_des_Retraits extends javax.swing.JInternalFrame {
 
     Connection conn = null;
     ResultSet rs = null;
@@ -53,19 +59,19 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     public static String mont2;
     public static String catp2;
     public ImageIcon Format = null;
-    private static final int WIDE = 255;
+    private static final int WIDE = 153;
 
     /**
-     * Creates new form Liste_des_Clients
+     * Creates new form Liste_des_Retraits
      * @throws java.sql.SQLException
      */
-    public Liste_des_Clients() throws SQLException {
+    public Liste_des_Retraits() throws SQLException {
         initComponents();
         conn = ConexionBD.Conexion();
 //        loadData();
         remove_title_bar();
-        txtrechercher.setText("Tapez N°Compte Client");
-        txtrechercher1.setText("Tapez Nom Client");
+        txtrechercher.setText("Tapez ID Retrait");
+        txtrechercher1.setText("Tapez N°Compte");
         nncontart.setVisible(false);
         ccode.setVisible(false);
         cconduite.setVisible(false);
@@ -79,20 +85,24 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     
     public void loadData() {
         try {
-            ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
-            clientAPI.findall().enqueue(new Callback<List<Client>>() {
+            RetraitAPI retraitAPI = UserAPI.getUser().create(RetraitAPI.class);
+            retraitAPI.findall().enqueue(new Callback<List<Retrait>>() {
                 @Override
-                public void onResponse(Call<List<Client>> call, Response<List<Client>> response) {
+                public void onResponse(Call<List<Retrait>> call, Response<List<Retrait>> response) {
                     if(response.isSuccessful()) {
                         DefaultTableModel defaultTableModel = new DefaultTableModel();
+                        defaultTableModel.addColumn("Id");
+                        defaultTableModel.addColumn("NumCheque");
                         defaultTableModel.addColumn("NumCompte");
-                        defaultTableModel.addColumn("Nom");
-                        defaultTableModel.addColumn("Solde");
-                        for(Client client : response.body()) {
+                        defaultTableModel.addColumn("Montant Retrait");
+                        defaultTableModel.addColumn("Date de Retrait");
+                        for(Retrait retrait : response.body()) {
                             defaultTableModel.addRow(new Object[] {
-                                client.getNumCompte(),
-                                client.getNom(),
-                                client.getSolde()
+                                retrait.getIdRetrait(),
+                                retrait.getNumCheque(),
+                                retrait.getNumCompte(),
+                                retrait.getMontant_Retrait(),
+                                retrait.getDateRetrait()
                             });
                         }
                         Table.setModel(defaultTableModel);
@@ -110,9 +120,10 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
                 }
 
                 @Override
-                public void onFailure(Call<List<Client>> call, Throwable t) {
+                public void onFailure(Call<List<Retrait>> call, Throwable t) {
                     JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
-                }    
+                }
+                   
             });
         } catch (Exception e) {
             JOptionPane.showConfirmDialog(null, e.getMessage());
@@ -125,7 +136,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }
 
     void remove_title_bar() {
-        putClientProperty("Liste_des_Clients.isPalette", Boolean.TRUE);
+        putClientProperty("Liste_des_Retraits.isPalette", Boolean.TRUE);
         getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         ((BasicInternalFrameUI) this.getUI()).setNorthPane(null);
         this.setBorder(null);
@@ -152,9 +163,12 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
     public void clear() {
         try {
+            txtNumCheque.setText("");
+            txtNumRe.setText("");
             txtNumCompte.setText("");
+            txtMontantRe.setText("");
             txtNom.setText("");
-            txtSolde.setText("");
+            txtDateRe.setText("");
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -188,14 +202,31 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     public void Deplace() {
         int row = Table.getSelectedRow();
         String id = Table.getValueAt(row, 0).toString();
+        RetraitAPI retraitAPI = UserAPI.getUser().create(RetraitAPI.class);
+        retraitAPI.find(Integer.parseInt(id)).enqueue(new Callback<Retrait>(){
+            @Override
+            public void onResponse(Call<Retrait> call, Response<Retrait> response) {
+                Retrait retrait = response.body();
+                txtNumRe.setText(String.valueOf(retrait.getIdRetrait()));
+                txtNumCheque.setText(retrait.getNumCheque());
+                txtNumCompte.setText(retrait.getNumCompte());
+                txtMontantRe.setText(String.valueOf(retrait.getMontant_Retrait()));
+                txtDateRe.setText(retrait.getDateRetrait());
+            }
+
+            @Override
+            public void onFailure(Call<Retrait> call, Throwable t) {
+                JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
+            }
+            
+        });
+        String numcompte = Table.getValueAt(row, 2).toString();
         ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
-        clientAPI.find(id).enqueue(new Callback<Client>(){
+        clientAPI.find(numcompte).enqueue(new Callback<Client>(){
             @Override
             public void onResponse(Call<Client> call, Response<Client> response) {
                 Client client = response.body();
-                txtNumCompte.setText(client.getNumCompte());
                 txtNom.setText(client.getNom());
-                txtSolde.setText(String.valueOf(client.getSolde()));
             }
 
             @Override
@@ -205,38 +236,14 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         });
 //        try {
 //
-//            int row = Table.getSelectedRow();
-//            Liste_des_Clients.test = (Table.getModel().getValueAt(row, 0).toString());
-//            String requet = " select * from  client_table where cin = '" + test + "' ";
+//            String numcompte = Table.getValueAt(row, 1).toString();
+//            String requet = " select * from  client where NumCompte = '" + numcompte + "' ";
 //            ps = conn.prepareStatement(requet);
 //            rs = ps.executeQuery();
 //
 //            if (rs.next()) {
-//                String t1 = rs.getString("cin");
-//                txtNumCompte.setText(t1);
-//                String t2 = rs.getString("nomc");
-//                txtNom.setText(t2);
-//                String t3 = rs.getString("prenomc");
-//                txtSolde.setText(t3);
-//                String t4 = rs.getString("date_naissance");
-//                txtns.setText(t4);
-//                String t5 = rs.getString("age");
-//                txtage.setText(t5);
-//                String t = rs.getString("sexe");
-//                txtesex.setText(t);
-//                String t7 = rs.getString("gsm");
-//                txtesexe.setText(t7);
-//                String t8 = rs.getString("adresse");
-//                txtmail.setText(t8);
-//                String t9 = rs.getString("date_inscription");
-//                txtinscri.setText(t9);
-//                String t10 = rs.getString("image");
-//                if (t10.equals("")) {
-//                    ImageIcon img202 = new ImageIcon(getClass().getResource("file_image_1.png"));
-//                    image.setIcon(img202);
-//                } else {
-//                    image.setIcon(new ImageIcon(t10));
-//                }
+//                String t1 = rs.getString("Nom");
+//                txtNom.setText(t1);
 //            }
 //            ps.close();
 //            rs.close();
@@ -270,11 +277,17 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        txtSolde = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        txtMontantRe = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         txtNom = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
         txtNumCompte = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        txtNumRe = new javax.swing.JLabel();
+        txtDateRe = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        txtNumCheque = new javax.swing.JLabel();
         nncontart = new javax.swing.JLabel();
         ccode = new javax.swing.JLabel();
         cconduite = new javax.swing.JLabel();
@@ -299,8 +312,6 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         printbtn = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        printmb = new javax.swing.JButton();
 
         setBorder(null);
         setTitle("Listes");
@@ -334,39 +345,73 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         });
         getContentPane().setLayout(null);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 2, true), "Information sur le Client :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 3, 12))); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 2, true), "Information sur le Retrait :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 3, 12))); // NOI18N
         jPanel1.setForeground(new java.awt.Color(0, 0, 204));
 
-        jLabel2.setText("Nom  :");
+        jLabel2.setText("N°Compte :");
 
-        txtSolde.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        txtSolde.setForeground(new java.awt.Color(0, 0, 153));
+        jLabel4.setText("Montant de Retrait :");
 
-        jLabel3.setText("Solde :");
+        txtMontantRe.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        txtMontantRe.setForeground(new java.awt.Color(0, 0, 153));
+
+        jLabel3.setText("Nom :");
 
         txtNom.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         txtNom.setForeground(new java.awt.Color(0, 0, 153));
 
-        jLabel1.setText("N°Compte :");
-
         txtNumCompte.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         txtNumCompte.setForeground(new java.awt.Color(0, 0, 153));
+
+        jLabel1.setText("N°Retrait :");
+
+        txtNumRe.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        txtNumRe.setForeground(new java.awt.Color(0, 0, 153));
+
+        txtDateRe.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        txtDateRe.setForeground(new java.awt.Color(0, 0, 153));
+
+        jLabel5.setText("Date de Retrait :");
+
+        jLabel6.setText("N°Cheque :");
+
+        txtNumCheque.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        txtNumCheque.setForeground(new java.awt.Color(0, 0, 153));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(29, 29, 29)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtSolde, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                    .addComponent(txtNom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtNumCompte, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(61, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtNumRe, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtMontantRe, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                            .addComponent(txtDateRe, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtNumCompte, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNom, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtNumCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(6, 6, 6)))
+                .addGap(190, 190, 190))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -374,20 +419,34 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
                 .addGap(2, 2, 2)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNumRe, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNumCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtNumCompte, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNom, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 21, Short.MAX_VALUE)
-                    .addComponent(txtNom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(14, 14, 14)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
-                    .addComponent(txtSolde, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtMontantRe, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtDateRe, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(110, 110, 110))
         );
 
         getContentPane().add(jPanel1);
-        jPanel1.setBounds(810, 120, 330, 140);
+        jPanel1.setBounds(810, 130, 330, 220);
 
         nncontart.setToolTipText("Pas du Contrat");
         nncontart.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -419,7 +478,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         getContentPane().add(cconduite);
         cconduite.setBounds(940, 6, 40, 40);
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153)), "Liste de Clients :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 3, 12))); // NOI18N
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153)), "Liste de Retraits :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 3, 12))); // NOI18N
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -490,7 +549,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
             }
         });
         getContentPane().add(txtrechercher);
-        txtrechercher.setBounds(4, 89, 213, 14);
+        txtrechercher.setBounds(613, 92, 213, 15);
 
         btnrefresh.setBackground(new java.awt.Color(153, 0, 0));
         btnrefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/GPB/images/interface.png"))); // NOI18N
@@ -502,7 +561,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
             }
         });
         getContentPane().add(btnrefresh);
-        btnrefresh.setBounds(230, 70, 70, 40);
+        btnrefresh.setBounds(840, 70, 70, 40);
 
         Panelaction.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153)), "Action :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Verdana", 1, 12))); // NOI18N
 
@@ -617,7 +676,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
         txtbachground.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/GPB/frame/txt2.png"))); // NOI18N
         getContentPane().add(txtbachground);
-        txtbachground.setBounds(0, 80, 220, 30);
+        txtbachground.setBounds(610, 90, 220, 20);
 
         txtrechercher1.setBackground(new java.awt.Color(240, 240, 240));
         txtrechercher1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -650,11 +709,11 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
             }
         });
         getContentPane().add(txtrechercher1);
-        txtrechercher1.setBounds(312, 89, 213, 14);
+        txtrechercher1.setBounds(922, 87, 213, 15);
 
         txtbackground1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/GPB/frame/txt2.png"))); // NOI18N
         getContentPane().add(txtbackground1);
-        txtbackground1.setBounds(310, 80, 220, 30);
+        txtbackground1.setBounds(920, 80, 220, 30);
         getContentPane().add(llogin);
         llogin.setBounds(340, 60, 160, 0);
 
@@ -705,7 +764,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
         jLabel10.setFont(new java.awt.Font("Advent Pro", 0, 40)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel10.setText("GESTION DES CLIENTS");
+        jLabel10.setText("GESTION DES RETRAITS");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -713,8 +772,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 502, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(648, Short.MAX_VALUE))
+                .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -724,66 +782,25 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         getContentPane().add(jPanel4);
         jPanel4.setBounds(0, 0, 1160, 50);
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Etat du Client :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Verdana", 1, 12))); // NOI18N
-
-        printmb.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        printmb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/GPB/images/printer.png"))); // NOI18N
-        printmb.setText("Mouvement Bancaire");
-        printmb.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        printmb.setContentAreaFilled(false);
-        printmb.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        printmb.setOpaque(true);
-        printmb.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                printmbMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                printmbMouseExited(evt);
-            }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                printmbMousePressed(evt);
-            }
-        });
-        printmb.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                printmbActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(printmb, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(printmb, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
-        );
-
-        getContentPane().add(jPanel3);
-        jPanel3.setBounds(684, 490, 260, 90);
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnajActionPerformed
-        Liste_des_Clients.te = "a";
+        Liste_des_Retraits.te = "a";
 
-        AjoutClient act = null;
+        AjoutRetrait act = null;
         try {
-            act = new AjoutClient();
+            act = new AjoutRetrait();
+            
+//            act.txtMontant.setText("");
+//            act.txtdateVe.setDate(new Date());
         } catch (SQLException ex) {
-            Logger.getLogger(Liste_des_Clients.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Liste_des_Retraits.class.getName()).log(Level.SEVERE, null, ex);
         }
         act.setVisible(true);
         act.cleardata();
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
         loadData();
         clear();
         //ImageIcon img202 = new ImageIcon(getClass().getResource("file_image_1.png"));
@@ -799,7 +816,6 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
     }//GEN-LAST:event_formInternalFrameActivated
 
     private void TableMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseEntered
@@ -808,12 +824,12 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
     private void btnsupprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnsupprimerActionPerformed
         try {
-            int result = JOptionPane.showConfirmDialog(null, "Voulez-vous vraiment supprimer ce client?",
-                    "Suppression Client", JOptionPane.YES_NO_OPTION);
+            int result = JOptionPane.showConfirmDialog(null, "Voulez-vous vraiment supprimer ce retrait?",
+                    "Suppression Retrait", JOptionPane.YES_NO_OPTION);
             
             if(result == JOptionPane.YES_NO_OPTION) {
-                    ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
-                    clientAPI.delete(txtNumCompte.getText()).enqueue(new Callback<Void>(){
+                    RetraitAPI retraitAPI = UserAPI.getUser().create(RetraitAPI.class);
+                    retraitAPI.delete(Integer.parseInt(txtNumRe.getText())).enqueue(new Callback<Void>(){
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
                             if(response.isSuccessful()) {
@@ -856,7 +872,6 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         }
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
         loadData();
         clear();
 
@@ -866,7 +881,6 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     private void TableMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseReleased
         btnsupprimer.setEnabled(true);
         modifierbtn.setEnabled(true);
-        printmb.setEnabled(true);
         //Deplace();
     }//GEN-LAST:event_TableMouseReleased
 
@@ -877,22 +891,42 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
 
     private void modifierbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modifierbtnActionPerformed
-        Liste_des_Clients.te = "ah";
+        Liste_des_Retraits.te = "ah";
         try {
-            AjoutClient act = new AjoutClient();
-            if(txtNumCompte.getText() != "") {
+            AjoutRetrait act = new AjoutRetrait();
+            if(txtNumRe.getText() != "") {
+                act.txtId.setText(txtNumRe.getText());
+                act.txtNumCheque.setText(txtNumCheque.getText());
                 act.txtNumCompte.setText(txtNumCompte.getText());
-                act.txtNom.setText(txtNom.getText());
-                act.txtSolde.setText(txtSolde.getText());
+                act.txtMontant.setText(txtMontantRe.getText());
+                act.txtAncienMontant.setText(txtMontantRe.getText());
+                act.txtNomB.setText(txtNom.getText());
+//                Calendar ca = new GregorianCalendar();
+//                String day = ca.get(Calendar.DAY_OF_MONTH) + "";
+//                String month = ca.get(Calendar.MONTH) + 1 + "";
+//                String year = ca.get(Calendar.YEAR) + "";
+//
+//                if (day.length() == 1) {
+//                    day = "0" + day;
+//                }
+//                if (month.length() == 1) {
+//                    month = "0" + month;
+//                }
+//
+//                String dd = year + "-" + month + "-" + day;
+                
+                Date date = new SimpleDateFormat("dd/MM/yyyy").parse(txtDateRe.getText());
+                act.txtdateRe.setDate(date);
             }
             act.setVisible(true);
         } catch (SQLException ex) {
-            Logger.getLogger(Liste_des_Clients.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Liste_des_Retraits.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(Liste_des_Retraits.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
         loadData();
         clear();
 
@@ -912,7 +946,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
     private void printbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printbtnActionPerformed
 
-        MessageFormat header = new MessageFormat("Liste des Clients:");
+        MessageFormat header = new MessageFormat("Liste de Retraits:");
         MessageFormat footer = new MessageFormat("Page{0,number,integer}");
         try {
             Table.print(JTable.PrintMode.FIT_WIDTH, header, footer);
@@ -929,14 +963,13 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         clear();
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
         txtrechercher.setText("");
         ImageIcon img = new ImageIcon(getClass().getResource("txt2.png"));
         txtbachground.setIcon(img);
-        txtrechercher.setText("Taper Cin Client");
+        txtrechercher.setText("Tapez Id Retrait");
         ImageIcon img2 = new ImageIcon(getClass().getResource("txt2.png"));
         txtbackground1.setIcon(img2);
-        txtrechercher1.setText("Taper Nom Client");
+        txtrechercher1.setText("Tapez N°Compte");
     }//GEN-LAST:event_formMouseClicked
 
     private void txtrechercherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtrechercherActionPerformed
@@ -949,13 +982,12 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         clear();
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
         ImageIcon img = new ImageIcon(getClass().getResource("txt2.png"));
         txtbachground.setIcon(img);
-        txtrechercher.setText("Taper Cin Client");
+        txtrechercher.setText("Tapez Id Retrait");
         ImageIcon img2 = new ImageIcon(getClass().getResource("txt2.png"));
         txtbackground1.setIcon(img2);
-        txtrechercher1.setText("Taper Nom Client");
+        txtrechercher1.setText("Tapez N°Compte");
     }//GEN-LAST:event_btnrefreshActionPerformed
     public void search() {
         try {
@@ -982,45 +1014,40 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }
     private void txtrechercherKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtrechercherKeyReleased
 
-        try {
-            ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
-            clientAPI.findBy(txtrechercher.getText()).enqueue(new Callback<List<Client>>() {
-                @Override
-                public void onResponse(Call<List<Client>> call, Response<List<Client>> response) {
-                    if(response.isSuccessful()) {
-                        DefaultTableModel defaultTableModel = new DefaultTableModel();
-                        defaultTableModel.addColumn("NumCompte");
-                        defaultTableModel.addColumn("Nom");
-                        defaultTableModel.addColumn("Solde");
-                        for(Client client : response.body()) {
-                            defaultTableModel.addRow(new Object[] {
-                                client.getNumCompte(),
-                                client.getNom(),
-                                client.getSolde()
-                            });
-                        }
-                        Table.setModel(defaultTableModel);
-//                        Table.getColumnModel().getColumn(0).setPreferredWidth(5);
-//                        Table.getColumnModel().getColumn(2).setPreferredWidth(100);
-                        Table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-                        for (int i = 0; i < Table.getColumnCount(); i++) {
-                            TableColumn col = Table.getColumnModel().getColumn(i);
-                            col.setPreferredWidth(WIDE);
-                            col.setMaxWidth(WIDE * 5);
-                        }
-                        Table.setPreferredScrollableViewportSize(new Dimension(
-                            Table.getColumnCount() * WIDE, Table.getRowHeight() * 16));
+        RetraitAPI retraitAPI = UserAPI.getUser().create(RetraitAPI.class);
+        retraitAPI.find(Integer.parseInt(txtrechercher.getText())).enqueue(new Callback<Retrait>(){
+            @Override
+            public void onResponse(Call<Retrait> call, Response<Retrait> response) {
+                Retrait retrait = response.body();
+                txtNumRe.setText(String.valueOf(retrait.getIdRetrait()));
+                txtNumCompte.setText(retrait.getNumCompte());
+                txtMontantRe.setText(String.valueOf(retrait.getMontant_Retrait()));
+                txtDateRe.setText(retrait.getDateRetrait());
+                
+                ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
+                clientAPI.find(retrait.getNumCompte()).enqueue(new Callback<Client>(){
+                    @Override
+                    public void onResponse(Call<Client> call, Response<Client> response) {
+                        Client client = response.body();
+                        txtNom.setText(client.getNom());
                     }
-                }
 
-                @Override
-                public void onFailure(Call<List<Client>> call, Throwable t) {
-                    JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
-                }    
-            });
-        } catch (Exception e) {
-            JOptionPane.showConfirmDialog(null, e.getMessage());
-        }
+                    @Override
+                    public void onFailure(Call<Client> call, Throwable t) {
+//                        JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call<Retrait> call, Throwable t) {
+                JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
+            }
+            
+        });
+        
+
+
 //        try {
 //            String requete = "select cin as 'CIN' ,nomc as 'Nom' ,prenomc as 'Prenom' ,date_naissance as 'Date de Naissance',sexe As 'Sexe',gsm as 'GSM',adresse as 'Adresse',date_inscription as 'Date dinscription' from  client_table where cin LIKE ?";
 //            ps = conn.prepareStatement(requete);
@@ -1047,7 +1074,6 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         clear();
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
     }//GEN-LAST:event_txtrechercherKeyTyped
 
     private void txtrechercherKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtrechercherKeyPressed
@@ -1060,13 +1086,12 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
         ImageIcon img = new ImageIcon(getClass().getResource("txt1.png"));
         txtbachground.setIcon(img);
         txtrechercher.setText("");
         ImageIcon img2 = new ImageIcon(getClass().getResource("txt2.png"));
         txtbackground1.setIcon(img2);
-        txtrechercher1.setText("Tapez Nom Client");
+        txtrechercher1.setText("Tapez N°Compte");
         // TODO add your handling code here:
     }//GEN-LAST:event_txtrechercherMouseClicked
 
@@ -1079,13 +1104,12 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         clear();
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
         ImageIcon img2 = new ImageIcon(getClass().getResource("txt1.png"));
         txtbackground1.setIcon(img2);
         txtrechercher1.setText("");
         ImageIcon img = new ImageIcon(getClass().getResource("txt2.png"));
         txtbachground.setIcon(img);
-        txtrechercher.setText("Tapez N°Compte Client");
+        txtrechercher.setText("Tapez Id Retrait");
     }//GEN-LAST:event_txtrechercher1MouseClicked
 
     private void txtrechercher1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtrechercher1MouseEntered
@@ -1101,22 +1125,26 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtrechercher1KeyPressed
 
     private void txtrechercher1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtrechercher1KeyReleased
-
+        
         try {
-            ClientAPI clientAPI = UserAPI.getUser().create(ClientAPI.class);
-            clientAPI.findBy(txtrechercher1.getText()).enqueue(new Callback<List<Client>>() {
+            RetraitAPI retraitAPI = UserAPI.getUser().create(RetraitAPI.class);
+            retraitAPI.findByNumCompte(txtrechercher1.getText()).enqueue(new Callback<List<Retrait>>() {
                 @Override
-                public void onResponse(Call<List<Client>> call, Response<List<Client>> response) {
+                public void onResponse(Call<List<Retrait>> call, Response<List<Retrait>> response) {
                     if(response.isSuccessful()) {
                         DefaultTableModel defaultTableModel = new DefaultTableModel();
+                        defaultTableModel.addColumn("Id");
+                        defaultTableModel.addColumn("NumCheque");
                         defaultTableModel.addColumn("NumCompte");
-                        defaultTableModel.addColumn("Nom");
-                        defaultTableModel.addColumn("Solde");
-                        for(Client client : response.body()) {
+                        defaultTableModel.addColumn("Montant Retrait");
+                        defaultTableModel.addColumn("Date de Retrait");
+                        for(Retrait retrait : response.body()) {
                             defaultTableModel.addRow(new Object[] {
-                                client.getNumCompte(),
-                                client.getNom(),
-                                client.getSolde()
+                                retrait.getIdRetrait(),
+                                retrait.getNumCheque(),
+                                retrait.getNumCompte(),
+                                retrait.getMontant_Retrait(),
+                                retrait.getDateRetrait()
                             });
                         }
                         Table.setModel(defaultTableModel);
@@ -1134,47 +1162,25 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
                 }
 
                 @Override
-                public void onFailure(Call<List<Client>> call, Throwable t) {
+                public void onFailure(Call<List<Retrait>> call, Throwable t) {
                     JOptionPane.showConfirmDialog(null, t.getMessage()); //To change body of generated methods, choose Tools | Templates.
-                }    
+                }
+                   
             });
         } catch (Exception e) {
             JOptionPane.showConfirmDialog(null, e.getMessage());
         }
-//        try {
-//            String requete = "select cin as 'CIN' ,nomc as 'Nom' ,prenomc as 'Prenom' ,date_naissance as 'Date de Naissance',age as 'Age',sexe As 'Sexe',gsm as 'GSM',adresse as 'Adresse',date_inscription as 'Date dinscription' from  client_table where nomc LIKE ?";
-//            ps = conn.prepareStatement(requete);
-//            ps.setString(1, "%" + txtrechercher1.getText() + "%");
-//            rs = ps.executeQuery();
-//            Table.setModel(DbUtils.resultSetToTableModel(rs));
-//            ps.close();
-//            rs.close();
-//        } catch (SQLException e) {
-//            System.out.println(e);
-//        } finally {
-//
-//            try {
-//                ps.close();
-//                rs.close();
-//
-//            } catch (SQLException e) {
-//                JOptionPane.showMessageDialog(null, "erreur BD");
-//            }
-//        }
-
-
     }//GEN-LAST:event_txtrechercher1KeyReleased
 
     private void txtrechercher1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtrechercher1KeyTyped
         clear();
         btnsupprimer.setEnabled(false);
         modifierbtn.setEnabled(false);
-        printmb.setEnabled(false);
     }//GEN-LAST:event_txtrechercher1KeyTyped
 
     private void ccodeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ccodeMouseClicked
         String info = "<html><head></head><body><h3 color ='#2C4CCC'><center>Contrat du Code de la route</center></h3><p>Cin :<b><i>" + test + "</i></b></p>"
-                + "<br><p>Nom & Prénom :<b><i>" + txtNom.getText() + "</i> " + txtSolde.getText() + "</b></p>"
+                + "<br><p>Nom & Prénom :<b><i>" + txtNumCompte.getText() + "</i> " + txtMontantRe.getText() + "</b></p>"
                 + "<br><p >Nombre D'heures du contrat :<b><i>" + nbrh2 + "</i></b></p>"
                 + "<br><p >Montant du Contrat  :<b><i>" + mont2 + "Dt</i></b></p>"
                 + "<br><p >Catégorie du Permis :<b><i>" + catp2 + "</i></b></p>"
@@ -1188,7 +1194,7 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
 
     private void cconduiteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cconduiteMouseClicked
         String info = "<html><head></head><body><h3 color='#2C4CCC'><center>Contrat du Conduite</center></h3> <p >Cin :<b><i>" + test + "</i></b></p>"
-                + "<br><p>Nom & Prénom :<b><i>" + txtNom.getText() + "</i>  " + txtSolde.getText() + "</b></p>"
+                + "<br><p>Nom & Prénom :<b><i>" + txtNumCompte.getText() + "</i>  " + txtMontantRe.getText() + "</b></p>"
                 + "<br><p >Nombre D'heures du contrat :<b><i>" + nbrh + "</i></b></p>"
                 + "<br><p >Montant du Contrat  :<b><i>" + mont + "Dt</i></b></p>"
                 + "<br><p >Catégorie du Permis :<b><i>" + catp + "</i></b></p>"
@@ -1258,36 +1264,6 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
         printbtn.setBackground(new java.awt.Color(0, 153, 153));
     }//GEN-LAST:event_printbtnMouseEntered
 
-    private void printmbMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_printmbMouseEntered
-        printmb.setBackground(new java.awt.Color(0, 153, 153));
-    }//GEN-LAST:event_printmbMouseEntered
-
-    private void printmbMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_printmbMouseExited
-        printmb.setBackground(new java.awt.Color(240, 240, 240));
-    }//GEN-LAST:event_printmbMouseExited
-
-    private void printmbMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_printmbMousePressed
-        printmb.setBackground(new java.awt.Color(255, 255, 255));
-    }//GEN-LAST:event_printmbMousePressed
-
-    private void printmbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printmbActionPerformed
-        ClientMouvementBancaire act = null;
-        try {
-            act = new ClientMouvementBancaire();
-            act.jTextField1.setText(txtNumCompte.getText());
-            
-        act.txtNumCompte.setText(txtNumCompte.getText());
-        act.txtNom.setText(txtNom.getText());
-        act.txtSolde.setText(txtSolde.getText());
-        act.loadData6();
-        act.loadData4();
-        act.loadData5();
-        } catch (SQLException ex) {
-            Logger.getLogger(ClientMouvementBancaire.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        act.setVisible(true);
-    }//GEN-LAST:event_printmbActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Panelaction;
@@ -1301,19 +1277,23 @@ public final class Liste_des_Clients extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel llogin;
     public javax.swing.JButton modifierbtn;
     private javax.swing.JLabel nncontart;
     private javax.swing.JButton printbtn;
-    private javax.swing.JButton printmb;
+    private javax.swing.JLabel txtDateRe;
+    private javax.swing.JLabel txtMontantRe;
     private javax.swing.JLabel txtNom;
-    private javax.swing.JLabel txtNumCompte;
-    private javax.swing.JLabel txtSolde;
+    private javax.swing.JLabel txtNumCheque;
+    public javax.swing.JLabel txtNumCompte;
+    private javax.swing.JLabel txtNumRe;
     private javax.swing.JLabel txtbachground;
     private javax.swing.JLabel txtbackground1;
     private javax.swing.JTextField txtrechercher;

@@ -25,8 +25,6 @@ public class UserAPI {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(user)
                 .build();
-        
-        System.out.println("retrofit: "+retrofit);
         return retrofit;
         
     }
